@@ -384,7 +384,7 @@
             body { 
                 background: white !important; color: #000 !important;
                 min-height: auto !important; margin: 0 !important; padding: 0 !important;
-                font-family: Arial, Helvetica, sans-serif !important; font-size: 8px !important;
+                font-family: Arial, Helvetica, sans-serif !important;
             }
             .header, .nav-tabs, .filter-bar, .btn, button, 
             .modal-overlay, .export-dropdown, .pdf-loading-overlay,
@@ -410,51 +410,99 @@
             .card-header { display: none !important; }
             .card-body { padding: 0 !important; }
             
-            /* ---- Visual Gantt - hide ---- */
-            .gantt-visual-chart { display: none !important; }
-            
-            /* ---- Print Gantt (HTML table) ---- */
-            .gantt-print-chart { display: block !important; margin: 0 0 4px 0; overflow: visible !important; }
-            
-            .print-gantt-table { border-collapse: collapse; width: 100%; table-layout: fixed; font-size: 7px; }
-            .print-gantt-table thead { display: table-header-group !important; }
-            .print-gantt-table thead th {
-                background: #e0e0e0 !important; color: #000 !important; font-weight: 700 !important; font-size: 7px !important;
-                border: 0.5px solid #999 !important; padding: 2px 1px !important; text-align: center; white-space: nowrap; vertical-align: middle;
+            /* ==================================================
+               VISUAL GANTT CHART - SHOW IN PRINT (B&W friendly)
+               ================================================== */
+            .gantt-visual-chart {
+                display: block !important;
+                overflow: visible !important;
+                max-height: none !important;
+                margin-bottom: 6px;
             }
-            .print-gantt-table thead th.pkg-hdr { text-align: left !important; padding-left: 3px !important; }
-            .print-gantt-table tbody tr { page-break-inside: avoid; }
-            .print-gantt-table tbody td {
-                border: 0.5px solid #ddd !important; padding: 0 !important; font-size: 7px !important;
-                color: #000 !important; vertical-align: middle; height: 16px; position: relative; overflow: visible; text-align: center;
+            /* Main flex container */
+            .gantt-visual-chart > div {
+                min-width: 100% !important;
+                border: 1px solid #666 !important;
+                border-radius: 0 !important;
+                overflow: visible !important;
             }
-            .print-gantt-table tbody td.pk {
-                padding: 1px 3px !important; background: #fafafa !important; font-size: 6.5px !important;
-                line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left;
-                font-weight: 600;
+            /* ALL backgrounds: white */
+            .gantt-visual-chart div[style*="background: rgba(15"] { background: #fff !important; }
+            .gantt-visual-chart div[style*="background: rgba(30"] { background: #f8f8f8 !important; }
+            .gantt-visual-chart div[style*="background:rgba(15"] { background: #fff !important; }
+            .gantt-visual-chart div[style*="background:rgba(30"] { background: #f8f8f8 !important; }
+            .gantt-visual-chart div[style*="rgba(15, 23, 42"] { background: #fff !important; }
+            .gantt-visual-chart div[style*="rgba(30, 41, 59"] { background: #f8f8f8 !important; }
+            
+            /* Header row: light gray */
+            .gantt-visual-chart div[style*="background: rgba(15, 23, 42, 0.95)"] { background: #e8e8e8 !important; }
+            .gantt-visual-chart div[style*="background: rgba(15, 23, 42, 0.9)"] { background: #f0f0f0 !important; }
+            
+            /* ALL text: black/dark */
+            .gantt-visual-chart div[style*="color: white"] { color: #000 !important; }
+            .gantt-visual-chart div[style*="color: #e2e8f0"] { color: #000 !important; }
+            .gantt-visual-chart div[style*="color: #94a3b8"] { color: #333 !important; }
+            .gantt-visual-chart div[style*="color: #14b8a6"] { color: #000 !important; }
+            .gantt-visual-chart div[style*="color:#94a3b8"] { color: #333 !important; }
+            
+            /* Grid lines: light */
+            .gantt-visual-chart div[style*="border-right: 1px solid #475569"] { border-right-color: #ccc !important; }
+            .gantt-visual-chart div[style*="border-bottom: 1px solid #334155"] { border-bottom-color: #ddd !important; }
+            .gantt-visual-chart div[style*="border-bottom: 2px solid #475569"] { border-bottom-color: #999 !important; }
+            .gantt-visual-chart div[style*="border-right: 2px solid #475569"] { border-right-color: #999 !important; }
+            .gantt-visual-chart div[style*="border: 1px solid #334155"] { border-color: #999 !important; }
+            
+            /* Month grid columns: subtle alternation */
+            .gantt-visual-chart div[style*="opacity: 0.3"] { opacity: 0.08 !important; background: #000 !important; }
+            
+            /* Sticky headers: not sticky in print */
+            .gantt-visual-chart div[style*="position: sticky"] { position: relative !important; }
+            
+            /* Date label text: dark for print */
+            .gantt-visual-chart div[style*="text-shadow"] { text-shadow: none !important; color: #000 !important; }
+            
+            /* Today marker: keep orange but darker */
+            .gantt-visual-chart div[style*="background: #f59e0b"] { background: #e65100 !important; }
+            .gantt-visual-chart div[style*="color: #f59e0b"] { color: #e65100 !important; }
+            .gantt-visual-chart div[style*="border: 1px solid #f59e0b"] { border-color: #e65100 !important; }
+            
+            /* Delay bar: keep red tint */
+            .gantt-visual-chart div[style*="background: #ef4444"] { background: #dc2626 !important; }
+            
+            /* PRESERVE triangle/marker colors */
+            .gantt-visual-chart div[style*="border-top: 12px solid"] {
+                filter: none !important;
+                print-color-adjust: exact; -webkit-print-color-adjust: exact;
             }
-            .print-gantt-table tbody td.pk .ps { font-size: 5.5px; color: #888; font-weight: 400; }
-            .print-gantt-table tbody tr:nth-child(even) td { background: #f7f7f7 !important; }
-            .print-gantt-table tbody tr:nth-child(even) td.pk { background: #f0f0f0 !important; }
-            .print-gantt-table .tc { background: rgba(229, 115, 0, 0.07) !important; }
-            .print-gantt-table thead .tc { background: #fff3e0 !important; color: #e65100 !important; }
+            .gantt-visual-chart div[style*="drop-shadow"] { filter: none !important; }
             
-            /* Triangle markers */
-            .gt { display: inline-block; width: 0; height: 0; border-left: 3.5px solid transparent; border-right: 3.5px solid transparent; vertical-align: middle; margin: 0 0.5px; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-            .gt-dp { border-top: 6px solid #0891b2; } .gt-da { border-top: 6px solid #0d9488; }
-            .gt-sp { border-top: 6px solid #7c3aed; } .gt-sa { border-top: 6px solid #9333ea; }
-            .gt-fp { border-top: 6px solid #d97706; } .gt-fa { border-top: 6px solid #059669; }
-            .dl { position: absolute; top: 1px; bottom: 1px; left: 0; right: 0; background: rgba(220,38,38,0.12) !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            /* Scroll containers: no overflow */
+            .gantt-visual-chart div[style*="overflow-x: auto"] { overflow: visible !important; }
+            .gantt-visual-chart div[style*="overflow-y: auto"] { overflow: visible !important; }
             
-            /* Gantt legend */
-            .pgl { display: flex !important; flex-wrap: wrap; gap: 7px; margin-top: 2px; padding: 2px 6px; background: #f5f5f5 !important; border: 0.5px solid #ccc !important; border-radius: 2px; font-size: 6.5px; color: #333; }
-            .pgl-i { display: flex; align-items: center; gap: 2px; }
-            .pgl-m { width: 7px; height: 7px; display: inline-block; print-color-adjust: exact; -webkit-print-color-adjust: exact; border-radius: 1px; }
-
+            /* Print gantt legend (inline under chart) */
+            .print-gantt-inline-legend {
+                display: flex !important;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 3px;
+                padding: 3px 8px;
+                background: #f5f5f5 !important;
+                border: 0.5px solid #ccc !important;
+                border-radius: 2px;
+                font-size: 7px;
+                color: #333;
+            }
+            .print-gantt-inline-legend .pgl-i { display: flex; align-items: center; gap: 3px; }
+            .print-gantt-inline-legend .pgl-m { width: 8px; height: 8px; display: inline-block; print-color-adjust: exact; -webkit-print-color-adjust: exact; border-radius: 1px; }
+            
+            /* ---- HIDE the HTML table gantt (not needed, visual gantt shown) ---- */
+            .gantt-print-chart { display: none !important; }
+            
             /* ---- Section divider ---- */
             .print-table-section-title { display: block !important; font-size: 9px; font-weight: 700; color: #000; margin: 6px 0 2px 0; padding: 0 0 1px 0; border-bottom: 1px solid #333; }
             
-            /* ---- Detail Table ---- */
+            /* ---- Detail Table (with repeating header) ---- */
             .gantt-print-table { display: table !important; }
             .gantt-table { border-collapse: collapse; width: 100%; table-layout: fixed; }
             .gantt-table thead { display: table-header-group !important; }
@@ -474,10 +522,11 @@
         .gantt-print-table { display: none !important; }
         .gantt-print-chart { display: none !important; }
         .print-table-section-title { display: none !important; }
+        .print-gantt-inline-legend { display: none; }
         @media print {
-            .gantt-print-chart { display: block !important; }
             .gantt-print-table { display: table !important; }
             .print-table-section-title { display: block !important; }
+            .print-gantt-inline-legend { display: flex !important; }
         }
     </style>
 </head>
@@ -906,17 +955,24 @@
                         </div>
                     </div>
 
-                    <!-- Gantt Chart Container (visual - screen only) -->
+                    <!-- Gantt Chart Container (visual - shown in both screen and print) -->
                     <div id="ganttChartContainer" class="gantt-visual-chart" style="overflow-x: auto; overflow-y: auto; max-height: 600px;">
                         <!-- Gantt chart will be rendered here -->
                     </div>
                     
-                    <!-- Print-only Gantt Chart (HTML table with repeating header) -->
-                    <div id="ganttPrintChart" class="gantt-print-chart">
-                        <!-- Generated by printScheduleReport() -->
+                    <!-- Print-only legend (under visual gantt) -->
+                    <div class="print-gantt-inline-legend" id="printGanttLegend">
+                        <div class="pgl-i"><span class="pgl-m" style="background:#0891b2;"></span><span>Plan Delivery</span></div>
+                        <div class="pgl-i"><span class="pgl-m" style="background:#0d9488;"></span><span>Actual Delivery</span></div>
+                        <div class="pgl-i"><span class="pgl-m" style="background:#7c3aed;"></span><span>Plan On Site</span></div>
+                        <div class="pgl-i"><span class="pgl-m" style="background:#9333ea;"></span><span>Actual On Site</span></div>
+                        <div class="pgl-i"><span class="pgl-m" style="background:#d97706;"></span><span>Plan FAT</span></div>
+                        <div class="pgl-i"><span class="pgl-m" style="background:#059669;"></span><span>Actual FAT</span></div>
+                        <div class="pgl-i"><span class="pgl-m" style="background:rgba(220,38,38,0.3);border:1px solid #dc2626;"></span><span>Delayed</span></div>
+                        <div class="pgl-i"><span style="color:#e65100;font-weight:700;">│</span><span>Today</span></div>
                     </div>
                     
-                    <!-- Print-only Schedule Table (with repeating header) -->
+                    <!-- Print-only Schedule Detail Table (with repeating header) -->
                     <div id="ganttPrintTable" class="gantt-print-table">
                         <!-- Generated by printScheduleReport() -->
                     </div>
@@ -5353,10 +5409,7 @@
                 return dA.localeCompare(dB);
             });
             
-            // ---- 3. Render Gantt Chart on Canvas ----
-            renderPrintGanttChart(filtered, view);
-            
-            // ---- 4. Build Detail Table ----
+            // ---- 3. Build Detail Table (visual gantt shown directly via CSS) ----
             buildPrintTable(filtered, view);
             
             // ---- 5. Ensure schedule tab active & print ----
@@ -5375,144 +5428,7 @@
          * Render print-friendly Gantt chart as HTML TABLE (repeating thead)
          * Each month = one column. Triangles placed in the cell matching the date's month.
          */
-        function renderPrintGanttChart(filteredPkgs, view) {
-            if (filteredPkgs.length === 0) {
-                document.getElementById('ganttPrintChart').innerHTML = '';
-                return;
-            }
-            
-            // Collect date range
-            const allDates = [];
-            filteredPkgs.forEach(p => {
-                const d = p.delivery || {}, m = p.manufacture || {};
-                if (view === 'all' || view === 'delivery') { if (d.planDelivery100) allDates.push(new Date(d.planDelivery100)); if (d.actualDelivery100) allDates.push(new Date(d.actualDelivery100)); }
-                if (view === 'all' || view === 'material') { if (d.planMaterialAtSite100) allDates.push(new Date(d.planMaterialAtSite100)); if (d.actualMaterialAtSite100) allDates.push(new Date(d.actualMaterialAtSite100)); }
-                if (view === 'all' || view === 'fat') { if (m.planFAT) allDates.push(new Date(m.planFAT)); if (m.actualFAT) allDates.push(new Date(m.actualFAT)); }
-            });
-            if (allDates.length === 0) { document.getElementById('ganttPrintChart').innerHTML = ''; return; }
-            
-            let minD = new Date(Math.min(...allDates)), maxD = new Date(Math.max(...allDates));
-            minD = new Date(minD.getFullYear(), minD.getMonth() - 1, 1);
-            maxD = new Date(maxD.getFullYear(), maxD.getMonth() + 2, 1);
-            
-            // Build month list
-            const months = [];
-            const cd = new Date(minD);
-            while (cd <= maxD) {
-                months.push({ y: cd.getFullYear(), m: cd.getMonth(), label: cd.toLocaleString('en-US',{month:'short'}) + ' ' + String(cd.getFullYear()).slice(-2) });
-                cd.setMonth(cd.getMonth() + 1);
-            }
-            
-            const todayStr = new Date().toISOString().split('T')[0];
-            const todayMonth = new Date().getMonth(), todayYear = new Date().getFullYear();
-            
-            // Helper: get month index for a date string
-            const getMonthIdx = (ds) => {
-                if (!ds) return -1;
-                const dt = new Date(ds);
-                return months.findIndex(m => m.y === dt.getFullYear() && m.m === dt.getMonth());
-            };
-            
-            // Marker definitions per view
-            const mkDefs = {
-                'all': [
-                    { key: 'delivery.planDelivery100', cls: 'gt-dp', label: 'Plan Delivery', title: 'PD' },
-                    { key: 'delivery.actualDelivery100', cls: 'gt-da', label: 'Actual Delivery', title: 'AD' },
-                    { key: 'delivery.planMaterialAtSite100', cls: 'gt-sp', label: 'Plan On Site', title: 'PS' },
-                    { key: 'delivery.actualMaterialAtSite100', cls: 'gt-sa', label: 'Actual On Site', title: 'AS' },
-                    { key: 'manufacture.planFAT', cls: 'gt-fp', label: 'Plan FAT', title: 'PF' },
-                    { key: 'manufacture.actualFAT', cls: 'gt-fa', label: 'Actual FAT', title: 'AF' },
-                ],
-                'delivery': [
-                    { key: 'delivery.planDelivery100', cls: 'gt-dp', label: 'Plan Delivery', title: 'PD' },
-                    { key: 'delivery.actualDelivery100', cls: 'gt-da', label: 'Actual Delivery', title: 'AD' },
-                ],
-                'material': [
-                    { key: 'delivery.planMaterialAtSite100', cls: 'gt-sp', label: 'Plan On Site', title: 'PS' },
-                    { key: 'delivery.actualMaterialAtSite100', cls: 'gt-sa', label: 'Actual On Site', title: 'AS' },
-                ],
-                'fat': [
-                    { key: 'manufacture.planFAT', cls: 'gt-fp', label: 'Plan FAT', title: 'PF' },
-                    { key: 'manufacture.actualFAT', cls: 'gt-fa', label: 'Actual FAT', title: 'AF' },
-                ],
-            };
-            const markers = mkDefs[view] || mkDefs['all'];
-            const getVal = (obj, path) => path.split('.').reduce((o, k) => o && o[k], obj);
-            
-            // Calculate column widths
-            const pkgColW = 180;
-            const monthColW = Math.max(30, Math.floor((1080 - pkgColW) / months.length));
-            
-            // Build thead
-            let thead = '<tr><th class="pkg-hdr" style="width:' + pkgColW + 'px;">Package Name</th>';
-            months.forEach(m => {
-                const isTodayCol = (m.y === todayYear && m.m === todayMonth);
-                thead += '<th style="width:' + monthColW + 'px;"' + (isTodayCol ? ' class="tc"' : '') + '>' + m.label + '</th>';
-            });
-            thead += '</tr>';
-            
-            // Build tbody
-            let tbody = '';
-            filteredPkgs.forEach((pkg, i) => {
-                // Determine which months have which markers
-                const cellContent = new Array(months.length).fill('');
-                const cellDelay = new Array(months.length).fill(false);
-                
-                markers.forEach(mk => {
-                    const ds = getVal(pkg, mk.key);
-                    const mi = getMonthIdx(ds);
-                    if (mi >= 0) {
-                        cellContent[mi] += '<span class="gt ' + mk.cls + '" title="' + mk.label + ': ' + ds + '"></span>';
-                    }
-                });
-                
-                // Mark delay months
-                const d = pkg.delivery || {}, mf = pkg.manufacture || {};
-                let planKey, actualKey;
-                if (view === 'delivery') { planKey = d.planDelivery100; actualKey = d.actualDelivery100; }
-                else if (view === 'material') { planKey = d.planMaterialAtSite100; actualKey = d.actualMaterialAtSite100; }
-                else if (view === 'fat') { planKey = mf.planFAT; actualKey = mf.actualFAT; }
-                else { planKey = d.planDelivery100; actualKey = d.actualDelivery100; }
-                
-                if (planKey && !actualKey && planKey < todayStr) {
-                    const planMi = getMonthIdx(planKey);
-                    const todayMi = months.findIndex(m => m.y === todayYear && m.m === todayMonth);
-                    if (planMi >= 0 && todayMi >= 0) {
-                        for (let x = planMi; x <= todayMi && x < months.length; x++) cellDelay[x] = true;
-                    }
-                }
-                
-                // Build row
-                const name = pkg.packageName || '';
-                const sub = (pkg.discipline || '') + ' • ' + (pkg.vendorName || '');
-                tbody += '<tr><td class="pk">' + name + '<br><span class="ps">' + sub + '</span></td>';
-                months.forEach((m, mi) => {
-                    const isTodayCol = (m.y === todayYear && m.m === todayMonth);
-                    let cls = isTodayCol ? ' class="tc"' : '';
-                    let inner = '';
-                    if (cellDelay[mi]) inner += '<div class="dl"></div>';
-                    inner += cellContent[mi];
-                    tbody += '<td' + cls + '>' + inner + '</td>';
-                });
-                tbody += '</tr>';
-            });
-            
-            // Build legend
-            const colorMap = { 'gt-dp':'#0891b2', 'gt-da':'#0d9488', 'gt-sp':'#7c3aed', 'gt-sa':'#9333ea', 'gt-fp':'#d97706', 'gt-fa':'#059669' };
-            let legend = '<div class="pgl">';
-            markers.forEach(mk => {
-                legend += '<div class="pgl-i"><span class="pgl-m" style="background:' + colorMap[mk.cls] + ';"></span><span>' + mk.label + '</span></div>';
-            });
-            legend += '<div class="pgl-i"><span class="pgl-m" style="background:rgba(220,38,38,0.25);border:1px solid #dc2626;"></span><span>Delayed</span></div>';
-            legend += '<div class="pgl-i"><span style="background:#fff3e0;border:1px solid #e65100;padding:0 3px;font-size:6px;">▮</span><span>Today</span></div>';
-            legend += '</div>';
-            
-            // Assemble
-            document.getElementById('ganttPrintChart').innerHTML = 
-                '<table class="print-gantt-table"><thead>' + thead + '</thead><tbody>' + tbody + '</tbody></table>' + legend;
-        }
-        
-        /**
+        /**        /**
          * Build print-only detail table with repeating header
          */
         function buildPrintTable(filtered, view) {
