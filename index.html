@@ -411,7 +411,7 @@
             .card-body { padding: 0 !important; }
             
             /* ==================================================
-               VISUAL GANTT CHART - SHOW IN PRINT (B&W friendly)
+               GANTT TABLE - PRINT (B&W, repeating header)
                ================================================== */
             .gantt-visual-chart {
                 display: block !important;
@@ -419,66 +419,45 @@
                 max-height: none !important;
                 margin-bottom: 6px;
             }
-            /* Main flex container */
-            .gantt-visual-chart > div {
-                min-width: 100% !important;
-                border: 1px solid #666 !important;
-                border-radius: 0 !important;
-                overflow: visible !important;
-            }
-            /* ALL backgrounds: white */
-            .gantt-visual-chart div[style*="background: rgba(15"] { background: #fff !important; }
-            .gantt-visual-chart div[style*="background: rgba(30"] { background: #f8f8f8 !important; }
-            .gantt-visual-chart div[style*="background:rgba(15"] { background: #fff !important; }
-            .gantt-visual-chart div[style*="background:rgba(30"] { background: #f8f8f8 !important; }
-            .gantt-visual-chart div[style*="rgba(15, 23, 42"] { background: #fff !important; }
-            .gantt-visual-chart div[style*="rgba(30, 41, 59"] { background: #f8f8f8 !important; }
             
-            /* Header row: light gray */
-            .gantt-visual-chart div[style*="background: rgba(15, 23, 42, 0.95)"] { background: #e8e8e8 !important; }
-            .gantt-visual-chart div[style*="background: rgba(15, 23, 42, 0.9)"] { background: #f0f0f0 !important; }
+            /* Table structure */
+            .gantt-tbl { border: 1px solid #999 !important; border-radius: 0 !important; }
+            .gantt-tbl thead { display: table-header-group !important; }
+            .gantt-tbl thead th { position: relative !important; } /* unstick */
+            .gantt-tbl tbody tr { page-break-inside: avoid; }
+            .gantt-tbl .gantt-pkg-th { position: relative !important; } /* unstick for print */
+            .gantt-tbl .gantt-pkg-td { position: relative !important; } /* unstick for print */
             
-            /* ALL text: black/dark */
-            .gantt-visual-chart div[style*="color: white"] { color: #000 !important; }
-            .gantt-visual-chart div[style*="color: #e2e8f0"] { color: #000 !important; }
-            .gantt-visual-chart div[style*="color: #94a3b8"] { color: #333 !important; }
-            .gantt-visual-chart div[style*="color: #14b8a6"] { color: #000 !important; }
-            .gantt-visual-chart div[style*="color:#94a3b8"] { color: #333 !important; }
+            /* Header: light gray bg, black text */
+            .gantt-tbl thead th { background: #e8e8e8 !important; border-color: #999 !important; }
+            .gantt-tbl thead th div[style*="color:#14b8a6"] { color: #000 !important; }
+            .gantt-tbl thead th div[style*="color:#94a3b8"] { color: #555 !important; }
+            .gantt-tbl th[style*="color:white"], .gantt-tbl th[style*="color: white"] { color: #000 !important; }
             
-            /* Grid lines: light */
-            .gantt-visual-chart div[style*="border-right: 1px solid #475569"] { border-right-color: #ccc !important; }
-            .gantt-visual-chart div[style*="border-bottom: 1px solid #334155"] { border-bottom-color: #ddd !important; }
-            .gantt-visual-chart div[style*="border-bottom: 2px solid #475569"] { border-bottom-color: #999 !important; }
-            .gantt-visual-chart div[style*="border-right: 2px solid #475569"] { border-right-color: #999 !important; }
-            .gantt-visual-chart div[style*="border: 1px solid #334155"] { border-color: #999 !important; }
+            /* Row backgrounds: white/light gray */
+            .gantt-tbl td[style*="rgba(15,23,42"] { background: #fff !important; }
+            .gantt-tbl td[style*="rgba(30,41,59"] { background: #f8f8f8 !important; }
+            .gantt-tbl td { border-color: #ddd !important; }
             
-            /* Month grid columns: subtle alternation */
-            .gantt-visual-chart div[style*="opacity: 0.3"] { opacity: 0.08 !important; background: #000 !important; }
+            /* Package name text: black */
+            .gantt-tbl div[style*="color:#e2e8f0"] { color: #000 !important; }
+            .gantt-tbl div[style*="color:#94a3b8"] { color: #555 !important; }
             
-            /* Sticky headers: not sticky in print */
-            .gantt-visual-chart div[style*="position: sticky"] { position: relative !important; }
+            /* Grid: subtle */
+            .gantt-tbl div[style*="opacity:0.3"] { opacity: 0.06 !important; background: #000 !important; }
+            .gantt-tbl div[style*="border-right:1px solid #475569"] { border-right-color: #ddd !important; }
             
-            /* Date label text: dark for print */
-            .gantt-visual-chart div[style*="text-shadow"] { text-shadow: none !important; color: #000 !important; }
+            /* Date labels: dark */
+            .gantt-tbl div[style*="text-shadow"] { text-shadow: none !important; color: #000 !important; }
             
-            /* Today marker: keep orange but darker */
-            .gantt-visual-chart div[style*="background: #f59e0b"] { background: #e65100 !important; }
-            .gantt-visual-chart div[style*="color: #f59e0b"] { color: #e65100 !important; }
-            .gantt-visual-chart div[style*="border: 1px solid #f59e0b"] { border-color: #e65100 !important; }
+            /* Today marker */
+            .gantt-tbl div[style*="background:#f59e0b"] { background: #e65100 !important; }
+            .gantt-visual-chart div[style*="color:#f59e0b"] { color: #e65100 !important; }
+            .gantt-visual-chart div[style*="border:1px solid #f59e0b"] { border-color: #e65100 !important; }
             
-            /* Delay bar: keep red tint */
-            .gantt-visual-chart div[style*="background: #ef4444"] { background: #dc2626 !important; }
-            
-            /* PRESERVE triangle/marker colors */
-            .gantt-visual-chart div[style*="border-top: 12px solid"] {
-                filter: none !important;
-                print-color-adjust: exact; -webkit-print-color-adjust: exact;
-            }
-            .gantt-visual-chart div[style*="drop-shadow"] { filter: none !important; }
-            
-            /* Scroll containers: no overflow */
-            .gantt-visual-chart div[style*="overflow-x: auto"] { overflow: visible !important; }
-            .gantt-visual-chart div[style*="overflow-y: auto"] { overflow: visible !important; }
+            /* Preserve triangle colors */
+            .gantt-tbl div[style*="border-top:12px solid"] { filter: none !important; }
+            .gantt-tbl div[style*="drop-shadow"] { filter: none !important; }
             
             /* Print gantt legend (inline under chart) */
             .print-gantt-inline-legend {
@@ -699,17 +678,10 @@
                             </button>
                             <div class="export-dropdown-divider"></div>
                             <div class="export-dropdown-header">Excel / Google Sheets</div>
-                            <button class="export-dropdown-item" onclick="exportToExcel('packages')">
+                            <button class="export-dropdown-item" onclick="exportToExcel('all')">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-                                All Packages Data
-                            </button>
-                            <button class="export-dropdown-item" onclick="exportToExcel('schedule')">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                Schedule & Milestones
-                            </button>
-                            <button class="export-dropdown-item" onclick="exportToExcel('risks')">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                                Risk Register
+                                Export All Data (.xlsx)
+                                <span style="font-size:0.7rem;color:#64748b;margin-left:auto;">3 sheets</span>
                             </button>
                         </div>
                     </div>
@@ -4444,36 +4416,89 @@
             const proj = projects.find(p => p.id === selectedProject);
             const pkgs = getProjectPackages();
             const rs = getProjectRisks();
-            const esc = (v) => { const s = String(v || '').replace(/"/g, '""'); return s.includes(',') || s.includes('\n') || s.includes('"') ? '"'+s+'"' : s; };
-            let csv = '\uFEFF'; // BOM for Excel UTF-8
+            const todayStr = new Date().toISOString().split('T')[0];
             
-            if (type === 'packages') {
-                csv += 'No,RFQ No,Package Name,Discipline,Area,Initiation,Vendor,COO,PO Plan,PO Actual,Mfg Start Plan,Mfg Start Actual,Mfg Finish Plan,Mfg Finish Actual,Mfg Progress Plan %,Mfg Progress Actual %,FAT Plan,FAT Actual,FAT Result,Delivery Plan,Delivery Actual,Material On Site Plan,Material On Site Actual\n';
-                pkgs.forEach((p, i) => {
-                    const ms = p.milestones || {}, mf = p.manufacture || {}, d = p.delivery || {};
-                    const plan = Math.round(calculateSCurve(mf.planStart, mf.planFinish));
-                    csv += [i+1, esc(p.rfqNo), esc(p.packageName), esc(p.discipline), esc(p.area), p.initiation,
-                        esc(p.vendorName), esc(p.coo), ms.issuePO?.plan||'', ms.issuePO?.actual||'',
-                        mf.planStart||'', mf.actualStart||'', mf.planFinish||'', mf.actualFinish||'',
-                        plan, mf.actualProgress||0, mf.planFAT||'', mf.actualFAT||'', esc(mf.fatResult||''),
-                        d.planDelivery100||'', d.actualDelivery100||'', d.planMaterialAtSite100||'', d.actualMaterialAtSite100||''
-                    ].join(',') + '\n';
+            // Load SheetJS dynamically if not present
+            const doExport = () => {
+                if (typeof XLSX === 'undefined') {
+                    showNotification('Loading Excel library...', 'info');
+                    const s = document.createElement('script');
+                    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+                    s.onload = () => buildAndDownloadXLSX();
+                    s.onerror = () => { fallbackCSV(); };
+                    document.head.appendChild(s);
+                } else {
+                    buildAndDownloadXLSX();
+                }
+            };
+            
+            const fallbackCSV = () => {
+                // Fallback: single-sheet CSV if XLSX fails to load
+                let csv = '\uFEFF';
+                csv += 'Package Name,Discipline,Vendor,Plan Delivery,Actual Delivery,Plan On Site,Actual On Site,Status\n';
+                pkgs.forEach(p => {
+                    const d = p.delivery || {};
+                    csv += ['"'+p.packageName+'"',p.discipline,'"'+(p.vendorName||'')+'"',d.planDelivery100||'',d.actualDelivery100||'',d.planMaterialAtSite100||'',d.actualMaterialAtSite100||'',''].join(',') + '\n';
                 });
-            } else if (type === 'schedule') {
-                csv += 'No,Package Name,Discipline,Vendor,COO,';
-                csv += 'Bid Evaluation Plan,Bid Evaluation Actual,Issue PO Plan,Issue PO Actual,Kick-Off Plan,Kick-Off Actual,';
-                csv += 'Design Approval Plan,Design Approval Actual,MR Approval Plan,MR Approval Actual,Sub-vendor PO Plan,Sub-vendor PO Actual,FAI Plan,FAI Actual,';
-                csv += 'Mfg Start Plan,Mfg Finish Plan,Mfg Progress %,FAT Plan,FAT Actual,FAT Result,';
-                csv += 'Delivery Plan,Delivery Actual,On Site Plan,On Site Actual,Delivery Status\n';
-                const today = new Date().toISOString().split('T')[0];
-                pkgs.forEach((p, i) => {
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url;
+                a.download = (proj?.name||'export').replace(/\s+/g,'_') + '_' + todayStr + '.csv';
+                a.click(); URL.revokeObjectURL(url);
+                showNotification('Exported as CSV (Excel library unavailable)', 'info');
+            };
+            
+            const buildAndDownloadXLSX = () => {
+                const wb = XLSX.utils.book_new();
+                
+                // ===== SHEET 1: Project =====
+                const projData = [
+                    ['PROJECT INFORMATION'],
+                    [],
+                    ['Field', 'Value'],
+                    ['Project Name', proj?.name || '-'],
+                    ['Owner', proj?.owner || '-'],
+                    ['Contractor', proj?.contractor || '-'],
+                    ['Technology Provider', proj?.technologyProvider || '-'],
+                    ['Contract Type', proj?.contractType || '-'],
+                    ['Contract Value (USD)', proj?.contractPrice || 0],
+                    ['Start Date', proj?.startDate || '-'],
+                    ['Finish Date', proj?.finishDate || '-'],
+                    ['Guarantee Power (MW)', proj?.guaranteePower || '-'],
+                    ['LD Delay (USD/day)', proj?.ldDelay || 0],
+                    ['Total Packages', pkgs.length],
+                    ['Export Date', new Date().toLocaleString()],
+                    [],
+                    ['SUMMARY STATISTICS'],
+                    [],
+                    ['Metric', 'Count'],
+                    ['PO Issued', pkgs.filter(p => p.milestones?.issuePO?.actual).length],
+                    ['Delivery Completed', pkgs.filter(p => p.delivery?.actualDelivery100).length],
+                    ['Material On Site', pkgs.filter(p => p.delivery?.actualMaterialAtSite100).length],
+                    ['Delivery Delayed', pkgs.filter(p => p.delivery?.planDelivery100 && p.delivery.planDelivery100 < todayStr && !p.delivery.actualDelivery100).length],
+                    ['FAT Completed', pkgs.filter(p => p.manufacture?.actualFAT).length],
+                    ['FAT Delayed', pkgs.filter(p => p.manufacture?.planFAT && p.manufacture.planFAT < todayStr && !p.manufacture.actualFAT).length],
+                ];
+                const ws1 = XLSX.utils.aoa_to_sheet(projData);
+                ws1['!cols'] = [{wch:25},{wch:40}];
+                XLSX.utils.book_append_sheet(wb, ws1, 'Project');
+                
+                // ===== SHEET 2: Packages =====
+                const pkgHeader = ['No','RFQ No','Package Name','Discipline','Area','Initiation','Vendor','COO',
+                    'Bid Eval Plan','Bid Eval Actual','Issue PO Plan','Issue PO Actual','Kick-Off Plan','Kick-Off Actual',
+                    'Design Approval Plan','Design Approval Actual','MR Approval Plan','MR Approval Actual',
+                    'Sub-vendor PO Plan','Sub-vendor PO Actual','FAI Plan','FAI Actual',
+                    'Mfg Start Plan','Mfg Finish Plan','Mfg Progress %',
+                    'FAT Plan','FAT Actual','FAT Result',
+                    'Delivery Plan','Delivery Actual','On Site Plan','On Site Actual','Delivery Status'];
+                const pkgRows = pkgs.map((p, i) => {
                     const ms = p.milestones || {}, mf = p.manufacture || {}, d = p.delivery || {};
-                    let status = 'Pending';
-                    if (d.actualMaterialAtSite100) status = 'On Site';
-                    else if (d.actualDelivery100) status = 'In Transit';
-                    else if (d.planDelivery100 && d.planDelivery100 < today) status = 'Delayed';
-                    else if (d.planDelivery100) status = 'Scheduled';
-                    csv += [i+1, esc(p.packageName), esc(p.discipline), esc(p.vendorName), esc(p.coo),
+                    let st = 'Pending';
+                    if (d.actualMaterialAtSite100) st = 'On Site';
+                    else if (d.actualDelivery100) st = 'In Transit';
+                    else if (d.planDelivery100 && d.planDelivery100 < todayStr) st = 'Delayed';
+                    else if (d.planDelivery100) st = 'Scheduled';
+                    return [i+1, p.rfqNo, p.packageName, p.discipline, p.area, p.initiation, p.vendorName||'', p.coo||'',
                         ms.bidEvaluation?.plan||'', ms.bidEvaluation?.actual||'',
                         ms.issuePO?.plan||'', ms.issuePO?.actual||'',
                         ms.kickOff?.plan||'', ms.kickOff?.actual||'',
@@ -4482,30 +4507,43 @@
                         ms.subVendorPO?.plan||'', ms.subVendorPO?.actual||'',
                         ms.fai?.plan||'', ms.fai?.actual||'',
                         mf.planStart||'', mf.planFinish||'', mf.actualProgress||0,
-                        mf.planFAT||'', mf.actualFAT||'', esc(mf.fatResult||''),
+                        mf.planFAT||'', mf.actualFAT||'', mf.fatResult||'',
                         d.planDelivery100||'', d.actualDelivery100||'',
-                        d.planMaterialAtSite100||'', d.actualMaterialAtSite100||'', status
-                    ].join(',') + '\n';
+                        d.planMaterialAtSite100||'', d.actualMaterialAtSite100||'', st
+                    ];
                 });
-            } else if (type === 'risks') {
-                csv += 'No,Package Name,Category,Risk Description,Probability,Impact,Risk Level,Status,Mitigation,Owner,Due Date,Auto Generated\n';
-                rs.forEach((r, i) => {
+                const ws2 = XLSX.utils.aoa_to_sheet([pkgHeader, ...pkgRows]);
+                ws2['!cols'] = [{wch:4},{wch:14},{wch:35},{wch:12},{wch:8},{wch:8},{wch:28},{wch:8},
+                    ...Array(24).fill({wch:12})];
+                ws2['!autofilter'] = { ref: 'A1:AG' + (pkgRows.length + 1) };
+                XLSX.utils.book_append_sheet(wb, ws2, 'Packages');
+                
+                // ===== SHEET 3: Risk Analysis =====
+                const riskHeader = ['No','Package Name','Category','Risk Description','Probability','Impact','Risk Level','Risk Score',
+                    'Status','Mitigation','Owner','Due Date','Source'];
+                const riskRows = rs.map((r, i) => {
                     const pkg = packages.find(p => p.id === r.packageId);
-                    csv += [i+1, esc(pkg?.packageName||'-'), esc(r.category), esc(r.riskDescription),
-                        r.probability, r.impact, r.riskLevel, r.status, esc(r.mitigation), esc(r.owner),
-                        r.dueDate||'', r.isAutoGenerated?'Yes':'No'
-                    ].join(',') + '\n';
+                    const scoreMap = { 'Low': 1, 'Medium': 2, 'High': 3 };
+                    const score = (scoreMap[r.probability]||1) * (scoreMap[r.impact]||1);
+                    return [i+1, pkg?.packageName||'-', r.category, r.riskDescription,
+                        r.probability, r.impact, r.riskLevel, score,
+                        r.status, r.mitigation, r.owner, r.dueDate||'',
+                        r.isAutoGenerated ? 'Auto-generated' : 'Manual'
+                    ];
                 });
-            }
+                const ws3 = XLSX.utils.aoa_to_sheet([riskHeader, ...riskRows]);
+                ws3['!cols'] = [{wch:4},{wch:30},{wch:18},{wch:45},{wch:10},{wch:10},{wch:10},{wch:8},
+                    {wch:8},{wch:45},{wch:15},{wch:12},{wch:14}];
+                ws3['!autofilter'] = { ref: 'A1:M' + (riskRows.length + 1) };
+                XLSX.utils.book_append_sheet(wb, ws3, 'Risk Analysis');
+                
+                // Download
+                const fileName = (proj?.name||'Procurement').replace(/\s+/g,'_') + '_Export_' + todayStr + '.xlsx';
+                XLSX.writeFile(wb, fileName);
+                showNotification('Exported to Excel (.xlsx) with 3 sheets: Project, Packages, Risk Analysis', 'success');
+            };
             
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = (proj?.name||'export').replace(/\s+/g,'_') + '_' + type + '_' + new Date().toISOString().split('T')[0] + '.csv';
-            a.click();
-            URL.revokeObjectURL(url);
-            showNotification('Exported to CSV — open in Excel or import to Google Sheets', 'success');
+            doExport();
         }
         
         // Legacy function for backward compatibility
@@ -4897,40 +4935,30 @@
             const discipline = document.getElementById('scheduleDisciplineFilter').value;
             const status = document.getElementById('scheduleStatusFilter').value;
             
-            // Get filtered packages
             let filteredPackages = packages.filter(p => p.projectId === selectedProject);
+            if (discipline !== 'all') filteredPackages = filteredPackages.filter(p => p.discipline === discipline);
             
-            // Apply discipline filter
-            if (discipline !== 'all') {
-                filteredPackages = filteredPackages.filter(p => p.discipline === discipline);
-            }
-            
-            // Apply status filter (view-aware: checks the relevant date type for the active view)
+            // View-aware status filter
             if (status !== 'all') {
                 filteredPackages = filteredPackages.filter(p => {
-                    const delivery = p.delivery || {};
-                    const manufacture = p.manufacture || {};
+                    const delivery = p.delivery || {}, manufacture = p.manufacture || {};
                     const today = new Date().toISOString().split('T')[0];
-                    
                     if (status === 'completed') {
                         if (view === 'fat') return !!manufacture.actualFAT;
                         if (view === 'delivery') return !!delivery.actualDelivery100;
                         if (view === 'material') return !!delivery.actualMaterialAtSite100;
                         return delivery.actualDelivery100 && delivery.actualMaterialAtSite100;
                     } else if (status === 'delayed') {
-                        const delayDel = delivery.planDelivery100 && delivery.planDelivery100 < today && !delivery.actualDelivery100;
-                        const delaySite = delivery.planMaterialAtSite100 && delivery.planMaterialAtSite100 < today && !delivery.actualMaterialAtSite100;
-                        const delayFAT = manufacture.planFAT && manufacture.planFAT < today && !manufacture.actualFAT;
-                        if (view === 'fat') return delayFAT;
-                        if (view === 'delivery') return delayDel;
-                        if (view === 'material') return delaySite;
-                        return delayDel || delaySite || delayFAT;
+                        const dd = delivery.planDelivery100 && delivery.planDelivery100 < today && !delivery.actualDelivery100;
+                        const ds = delivery.planMaterialAtSite100 && delivery.planMaterialAtSite100 < today && !delivery.actualMaterialAtSite100;
+                        const df = manufacture.planFAT && manufacture.planFAT < today && !manufacture.actualFAT;
+                        if (view === 'fat') return df; if (view === 'delivery') return dd; if (view === 'material') return ds;
+                        return dd || ds || df;
                     } else if (status === 'ongoing') {
                         if (view === 'fat') return manufacture.planFAT && !manufacture.actualFAT;
                         if (view === 'delivery') return delivery.planDelivery100 && !delivery.actualDelivery100;
                         if (view === 'material') return delivery.planMaterialAtSite100 && !delivery.actualMaterialAtSite100;
-                        return (delivery.planDelivery100 && !delivery.actualDelivery100) ||
-                               (delivery.planMaterialAtSite100 && !delivery.actualMaterialAtSite100);
+                        return (delivery.planDelivery100 && !delivery.actualDelivery100) || (delivery.planMaterialAtSite100 && !delivery.actualMaterialAtSite100);
                     } else if (status === 'upcoming') {
                         if (view === 'fat') return manufacture.planFAT && manufacture.planFAT > today;
                         if (view === 'delivery') return delivery.planDelivery100 && delivery.planDelivery100 > today;
@@ -4941,289 +4969,157 @@
                 });
             }
             
-            // Sort packages based on view
             filteredPackages.sort((a, b) => {
-                let dateA, dateB;
-                
-                if (view === 'fat') {
-                    // Sort by FAT date
-                    dateA = a.manufacture?.planFAT || '9999-12-31';
-                    dateB = b.manufacture?.planFAT || '9999-12-31';
-                } else {
-                    // Sort by delivery date
-                    dateA = a.delivery?.planDelivery100 || '9999-12-31';
-                    dateB = b.delivery?.planDelivery100 || '9999-12-31';
-                }
-                
-                return dateA.localeCompare(dateB);
+                const dA = view === 'fat' ? (a.manufacture?.planFAT || '9999') : (a.delivery?.planDelivery100 || '9999');
+                const dB = view === 'fat' ? (b.manufacture?.planFAT || '9999') : (b.delivery?.planDelivery100 || '9999');
+                return dA.localeCompare(dB);
             });
             
             if (filteredPackages.length === 0) {
-                document.getElementById('ganttChartContainer').innerHTML = '<div style="text-align: center; padding: 3rem; color: #64748b;">No schedule data available for selected filters</div>';
-                updateScheduleStats();
-                return;
+                document.getElementById('ganttChartContainer').innerHTML = '<div style="text-align:center;padding:3rem;color:#64748b;">No schedule data available for selected filters</div>';
+                updateScheduleStats(); return;
             }
             
-            // Find date range based on view
+            // Collect date range
             const allDates = [];
             filteredPackages.forEach(p => {
-                if (view === 'all') {
-                    // For View All, collect all milestone dates
-                    if (p.delivery?.planDelivery100) allDates.push(new Date(p.delivery.planDelivery100));
-                    if (p.delivery?.actualDelivery100) allDates.push(new Date(p.delivery.actualDelivery100));
-                    if (p.delivery?.planMaterialAtSite100) allDates.push(new Date(p.delivery.planMaterialAtSite100));
-                    if (p.delivery?.actualMaterialAtSite100) allDates.push(new Date(p.delivery.actualMaterialAtSite100));
-                    if (p.manufacture?.planFAT) allDates.push(new Date(p.manufacture.planFAT));
-                    if (p.manufacture?.actualFAT) allDates.push(new Date(p.manufacture.actualFAT));
-                } else if (view === 'fat') {
-                    // For FAT view, collect FAT dates
-                    if (p.manufacture?.planFAT) allDates.push(new Date(p.manufacture.planFAT));
-                    if (p.manufacture?.actualFAT) allDates.push(new Date(p.manufacture.actualFAT));
-                } else if (view === 'material') {
-                    // For Material view, collect material on site dates
-                    if (p.delivery?.planMaterialAtSite100) allDates.push(new Date(p.delivery.planMaterialAtSite100));
-                    if (p.delivery?.actualMaterialAtSite100) allDates.push(new Date(p.delivery.actualMaterialAtSite100));
-                } else if (view === 'delivery') {
-                    // For Delivery view, collect delivery dates
-                    if (p.delivery?.planDelivery100) allDates.push(new Date(p.delivery.planDelivery100));
-                    if (p.delivery?.actualDelivery100) allDates.push(new Date(p.delivery.actualDelivery100));
-                }
+                const d = p.delivery || {}, m = p.manufacture || {};
+                if (view === 'all' || view === 'delivery') { if (d.planDelivery100) allDates.push(new Date(d.planDelivery100)); if (d.actualDelivery100) allDates.push(new Date(d.actualDelivery100)); }
+                if (view === 'all' || view === 'material') { if (d.planMaterialAtSite100) allDates.push(new Date(d.planMaterialAtSite100)); if (d.actualMaterialAtSite100) allDates.push(new Date(d.actualMaterialAtSite100)); }
+                if (view === 'all' || view === 'fat') { if (m.planFAT) allDates.push(new Date(m.planFAT)); if (m.actualFAT) allDates.push(new Date(m.actualFAT)); }
             });
-            
             if (allDates.length === 0) {
-                document.getElementById('ganttChartContainer').innerHTML = '<div style="text-align: center; padding: 3rem; color: #64748b;">No schedule data available</div>';
-                updateScheduleStats();
-                return;
+                document.getElementById('ganttChartContainer').innerHTML = '<div style="text-align:center;padding:3rem;color:#64748b;">No schedule data available</div>';
+                updateScheduleStats(); return;
             }
             
             const minDate = new Date(Math.min(...allDates));
             const maxDate = new Date(Math.max(...allDates));
+            minDate.setMonth(minDate.getMonth() - 1); minDate.setDate(1);
+            maxDate.setMonth(maxDate.getMonth() + 2); maxDate.setDate(1);
             
-            // Add padding to date range
-            minDate.setMonth(minDate.getMonth() - 1);
-            maxDate.setMonth(maxDate.getMonth() + 2);
-            
-            // Set to first day of month
-            minDate.setDate(1);
-            maxDate.setDate(1);
-            
-            // Helper function to format date as dd-MMM-yy
             const formatDate = (dateStr) => {
                 if (!dateStr) return '';
                 const date = new Date(dateStr);
-                const day = String(date.getDate()).padStart(2, '0');
-                const month = date.toLocaleString('en-US', { month: 'short' });
-                const year = String(date.getFullYear()).slice(-2);
-                return `${day}-${month}-${year}`;
+                return String(date.getDate()).padStart(2,'0') + '-' + date.toLocaleString('en-US',{month:'short'}) + '-' + String(date.getFullYear()).slice(-2);
             };
             
-            // Generate months for header
+            // Build months
             const months = [];
-            const currentDate = new Date(minDate);
-            while (currentDate <= maxDate) {
-                months.push({
-                    year: currentDate.getFullYear(),
-                    month: currentDate.getMonth(),
-                    label: currentDate.toLocaleString('en-US', { month: 'short', year: 'numeric' }),
-                    firstDay: new Date(currentDate.getFullYear(), currentDate.getMonth(), 1),
-                    daysInMonth: new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate()
-                });
-                currentDate.setMonth(currentDate.getMonth() + 1);
+            const cd = new Date(minDate);
+            while (cd <= maxDate) {
+                months.push({ year: cd.getFullYear(), month: cd.getMonth(), label: cd.toLocaleString('en-US',{month:'short',year:'numeric'}), firstDay: new Date(cd.getFullYear(), cd.getMonth(), 1), daysInMonth: new Date(cd.getFullYear(), cd.getMonth()+1, 0).getDate() });
+                cd.setMonth(cd.getMonth() + 1);
             }
             
-            // Calculate dimensions
             const dayWidth = 3;
             const rowHeight = 60;
-            const leftColumnWidth = 300;
-            const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24));
+            const leftColW = 300;
+            const totalDays = Math.ceil((maxDate - minDate) / 86400000);
             const chartWidth = totalDays * dayWidth;
-            
-            // Build Gantt chart HTML
-            let ganttHTML = `
-                <div style="display: flex; min-width: ${chartWidth + leftColumnWidth}px; border: 1px solid #334155; border-radius: 8px; overflow: hidden;">
-                    <!-- Y-Axis: Package Names Column -->
-                    <div style="width: ${leftColumnWidth}px; flex-shrink: 0; border-right: 2px solid #475569; background: rgba(15, 23, 42, 0.9);">
-                        <!-- Header -->
-                        <div style="height: 80px; background: rgba(15, 23, 42, 0.95); border-bottom: 2px solid #475569; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; position: sticky; top: 0; z-index: 20; font-size: 0.9rem;">
-                            PACKAGE NAME
-                        </div>
-            `;
-            
-            // Package names (Y-axis items)
-            filteredPackages.forEach((pkg, index) => {
-                const bgColor = index % 2 === 0 ? 'rgba(30, 41, 59, 0.5)' : 'rgba(15, 23, 42, 0.5)';
-                ganttHTML += `
-                    <div style="height: ${rowHeight}px; padding: 0.75rem; border-bottom: 1px solid #334155; display: flex; flex-direction: column; justify-content: center; background: ${bgColor};">
-                        <div style="font-size: 0.85rem; font-weight: 600; color: #e2e8f0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 0.25rem;" title="${pkg.packageName}">
-                            ${pkg.packageName}
-                        </div>
-                        <div style="font-size: 0.7rem; color: #94a3b8;">
-                            ${pkg.discipline || 'N/A'} • ${pkg.vendorName || 'N/A'}
-                        </div>
-                    </div>
-                `;
-            });
-            
-            ganttHTML += `
-                    </div>
-                    
-                    <!-- X-Axis: Timeline Column -->
-                    <div style="flex: 1; overflow-x: auto; position: relative;">
-                        <!-- Timeline Header (X-axis: Months) -->
-                        <div style="height: 80px; background: rgba(15, 23, 42, 0.95); border-bottom: 2px solid #475569; display: flex; position: sticky; top: 0; z-index: 10;">
-            `;
-            
-            // Month headers (X-axis)
-            months.forEach(month => {
-                const monthWidth = month.daysInMonth * dayWidth;
-                ganttHTML += `
-                    <div style="min-width: ${monthWidth}px; width: ${monthWidth}px; border-right: 1px solid #475569; padding: 0.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                        <div style="font-size: 0.8rem; font-weight: 700; color: #14b8a6;">${month.label.split(' ')[0]}</div>
-                        <div style="font-size: 0.7rem; color: #94a3b8;">${month.label.split(' ')[1]}</div>
-                    </div>
-                `;
-            });
-            
-            ganttHTML += `
-                        </div>
-                        
-                        <!-- Timeline Grid and Bars -->
-                        <div style="position: relative; min-height: ${filteredPackages.length * rowHeight}px;">
-            `;
-            
-            // Draw vertical grid lines for months
-            let xPos = 0;
-            months.forEach((month, idx) => {
-                const monthWidth = month.daysInMonth * dayWidth;
-                const lineColor = idx % 2 === 0 ? '#334155' : '#1e293b';
-                ganttHTML += `
-                    <div style="position: absolute; left: ${xPos}px; top: 0; bottom: 0; width: ${monthWidth}px; background: ${lineColor}; opacity: 0.3; border-right: 1px solid #475569;"></div>
-                `;
-                xPos += monthWidth;
-            });
-            
-            // Add today marker
             const today = new Date();
-            const todayOffset = Math.floor((today - minDate) / (1000 * 60 * 60 * 24)) * dayWidth;
-            if (todayOffset >= 0 && todayOffset <= chartWidth) {
-                ganttHTML += `
-                    <div style="position: absolute; left: ${todayOffset}px; top: 0; bottom: 0; width: 2px; background: #f59e0b; z-index: 8;">
-                        <div style="position: sticky; top: 85px; left: -25px; width: 50px; text-align: center; font-size: 0.65rem; color: #f59e0b; font-weight: 700; background: rgba(15, 23, 42, 0.9); padding: 0.25rem; border-radius: 4px; border: 1px solid #f59e0b;">TODAY</div>
-                    </div>
-                `;
-            }
+            const todayStr = today.toISOString().split('T')[0];
+            const todayOffset = Math.floor((today - minDate) / 86400000) * dayWidth;
             
-            // Draw triangles for each package (rows)
+            // Helper: date to px offset from timeline start
+            const dateToPx = (ds) => { if (!ds) return null; return Math.floor((new Date(ds) - minDate) / 86400000) * dayWidth; };
+            
+            // ===== BUILD TABLE-BASED GANTT (supports <thead> repeat in print) =====
+            let html = '<table class="gantt-tbl" style="border-collapse:collapse;min-width:' + (chartWidth + leftColW) + 'px;border:1px solid #334155;border-radius:8px;">';
+            
+            // THEAD - Package Name header + month columns
+            html += '<thead><tr>';
+            html += '<th class="gantt-pkg-th" style="width:'+leftColW+'px;min-width:'+leftColW+'px;height:50px;background:rgba(15,23,42,0.95);border-bottom:2px solid #475569;border-right:2px solid #475569;color:white;font-weight:700;font-size:0.85rem;text-align:center;position:sticky;left:0;z-index:20;padding:0.5rem;">PACKAGE NAME</th>';
+            months.forEach(m => {
+                const mw = m.daysInMonth * dayWidth;
+                html += '<th style="min-width:'+mw+'px;width:'+mw+'px;background:rgba(15,23,42,0.95);border-bottom:2px solid #475569;border-right:1px solid #475569;padding:0.4rem;text-align:center;vertical-align:middle;">' +
+                    '<div style="font-size:0.75rem;font-weight:700;color:#14b8a6;">' + m.label.split(' ')[0] + '</div>' +
+                    '<div style="font-size:0.65rem;color:#94a3b8;">' + m.label.split(' ')[1] + '</div></th>';
+            });
+            html += '</tr></thead>';
+            
+            // TBODY - Rows
+            html += '<tbody>';
             filteredPackages.forEach((pkg, index) => {
                 const delivery = pkg.delivery || {};
-                const bgColor = index % 2 === 0 ? 'rgba(30, 41, 59, 0.5)' : 'rgba(15, 23, 42, 0.5)';
-                const yPos = index * rowHeight;
-                
-                // Background row
-                ganttHTML += `<div style="position: absolute; top: ${yPos}px; left: 0; right: 0; height: ${rowHeight}px; border-bottom: 1px solid #334155; background: ${bgColor}; z-index: 1;"></div>`;
-                
-                // Helper function to draw triangle pointer with date label
-                const drawTriangleWithLabel = (dateStr, color, label, yOffset) => {
-                    if (!dateStr) return '';
-                    const date = new Date(dateStr);
-                    const offset = Math.floor((date - minDate) / (1000 * 60 * 60 * 24)) * dayWidth;
-                    const formattedDate = formatDate(dateStr);
-                    
-                    // Create downward pointing triangle (▼)
-                    return `
-                        <div style="position: absolute; top: ${yPos + yOffset}px; left: ${offset - 6}px; display: flex; align-items: center; z-index: 5;">
-                            <div style="width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 12px solid ${color}; cursor: pointer; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4));" 
-                                 title="${label}: ${dateStr}">
-                            </div>
-                            <div style="margin-left: 10px; font-size: 0.7rem; color: #94a3b8; white-space: nowrap; font-weight: 500; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
-                                ${formattedDate}
-                            </div>
-                        </div>
-                    `;
-                };
-                
-                // Helper function to draw span bar (for delays)
-                const drawSpanBar = (startDate, endDate, color, label, yOffset) => {
-                    if (!startDate) return '';
-                    const start = new Date(startDate);
-                    const end = endDate ? new Date(endDate) : new Date();
-                    const startOffset = Math.floor((start - minDate) / (1000 * 60 * 60 * 24)) * dayWidth;
-                    const endOffset = Math.floor((end - minDate) / (1000 * 60 * 60 * 24)) * dayWidth;
-                    const barWidth = Math.max(endOffset - startOffset, 5);
-                    const barHeight = 8;
-                    
-                    return `
-                        <div style="position: absolute; top: ${yPos + yOffset}px; left: ${startOffset}px; width: ${barWidth}px; height: ${barHeight}px; background: ${color}; border-radius: 2px; z-index: 4; opacity: 0.7;" 
-                             title="${label}: ${startDate} → ${endDate || 'Ongoing'}">
-                        </div>
-                    `;
-                };
-                
-                // Render milestones based on view selection
                 const manufacture = pkg.manufacture || {};
+                const bgColor = index % 2 === 0 ? 'rgba(30,41,59,0.5)' : 'rgba(15,23,42,0.5)';
                 
-                // View All - show all milestones with different Y offsets
+                html += '<tr>';
+                // Package name cell (sticky left)
+                html += '<td class="gantt-pkg-td" style="width:'+leftColW+'px;min-width:'+leftColW+'px;height:'+rowHeight+'px;padding:0.5rem 0.75rem;border-bottom:1px solid #334155;border-right:2px solid #475569;background:'+bgColor+';position:sticky;left:0;z-index:5;">' +
+                    '<div style="font-size:0.82rem;font-weight:600;color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:0.2rem;" title="'+pkg.packageName+'">' + pkg.packageName + '</div>' +
+                    '<div style="font-size:0.68rem;color:#94a3b8;">' + (pkg.discipline||'N/A') + ' • ' + (pkg.vendorName||'N/A') + '</div></td>';
+                
+                // Timeline cell: one merged cell spanning all months
+                html += '<td colspan="'+months.length+'" style="padding:0;height:'+rowHeight+'px;border-bottom:1px solid #334155;background:'+bgColor+';position:relative;overflow:visible;">';
+                
+                // Month grid lines
+                let mx = 0;
+                months.forEach((m, mi) => {
+                    const mw = m.daysInMonth * dayWidth;
+                    const lc = mi % 2 === 0 ? '#334155' : '#1e293b';
+                    html += '<div style="position:absolute;left:'+mx+'px;top:0;bottom:0;width:'+mw+'px;background:'+lc+';opacity:0.3;border-right:1px solid #475569;"></div>';
+                    mx += mw;
+                });
+                
+                // Today marker
+                if (todayOffset >= 0 && todayOffset <= chartWidth) {
+                    html += '<div style="position:absolute;left:'+todayOffset+'px;top:0;bottom:0;width:2px;background:#f59e0b;z-index:8;"></div>';
+                }
+                
+                // Triangle helper
+                const tri = (dateStr, color, label, yOff) => {
+                    if (!dateStr) return '';
+                    const px = dateToPx(dateStr);
+                    if (px === null) return '';
+                    const fd = formatDate(dateStr);
+                    return '<div style="position:absolute;top:'+yOff+'px;left:'+(px-6)+'px;display:flex;align-items:center;z-index:5;">' +
+                        '<div style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:12px solid '+color+';cursor:pointer;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.4));" title="'+label+': '+dateStr+'"></div>' +
+                        '<div style="margin-left:10px;font-size:0.7rem;color:#94a3b8;white-space:nowrap;font-weight:500;text-shadow:1px 1px 2px rgba(0,0,0,0.8);">'+fd+'</div></div>';
+                };
+                const bar = (sd, ed, color, label, yOff) => {
+                    if (!sd) return '';
+                    const s = dateToPx(sd), e = dateToPx(ed || todayStr);
+                    if (s === null) return '';
+                    const w = Math.max((e||todayOffset) - s, 5);
+                    return '<div style="position:absolute;top:'+yOff+'px;left:'+s+'px;width:'+w+'px;height:8px;background:'+color+';border-radius:2px;z-index:4;opacity:0.7;" title="'+label+'"></div>';
+                };
+                
                 if (view === 'all') {
-                    // Delivery (top row)
-                    ganttHTML += drawTriangleWithLabel(delivery.planDelivery100, '#06b6d4', 'Plan Delivery', 5);
-                    ganttHTML += drawTriangleWithLabel(delivery.actualDelivery100, '#14b8a6', 'Actual Delivery', 5);
-                    
-                    // Material On Site (middle row)
-                    ganttHTML += drawTriangleWithLabel(delivery.planMaterialAtSite100, '#8b5cf6', 'Plan Material On Site', 22);
-                    ganttHTML += drawTriangleWithLabel(delivery.actualMaterialAtSite100, '#a855f7', 'Actual Material On Site', 22);
-                    
-                    // FAT (bottom row)
-                    ganttHTML += drawTriangleWithLabel(manufacture.planFAT, '#f59e0b', 'Plan FAT', 39);
-                    ganttHTML += drawTriangleWithLabel(manufacture.actualFAT, '#10b981', 'Actual FAT', 39);
-                    
-                    // Delay indicators
-                    if (delivery.planDelivery100 && !delivery.actualDelivery100) {
-                        const planDate = new Date(delivery.planDelivery100);
-                        if (planDate < today) {
-                            ganttHTML += drawSpanBar(delivery.planDelivery100, today.toISOString().split('T')[0], '#ef4444', 'Delivery Delayed', 52);
-                        }
-                    }
-                }
-                // Delivery view - show only delivery milestones
-                else if (view === 'delivery') {
-                    ganttHTML += drawTriangleWithLabel(delivery.planDelivery100, '#06b6d4', 'Plan Delivery', 8);
-                    ganttHTML += drawTriangleWithLabel(delivery.actualDelivery100, '#14b8a6', 'Actual Delivery', 8);
-                }
-                // Material view - show only material on site milestones
-                else if (view === 'material') {
-                    ganttHTML += drawTriangleWithLabel(delivery.planMaterialAtSite100, '#8b5cf6', 'Plan Material On Site', 8);
-                    ganttHTML += drawTriangleWithLabel(delivery.actualMaterialAtSite100, '#a855f7', 'Actual Material On Site', 8);
-                }
-                // FAT view - show only FAT milestones
-                else if (view === 'fat') {
-                    ganttHTML += drawTriangleWithLabel(manufacture.planFAT, '#f59e0b', 'Plan FAT', 8);
-                    ganttHTML += drawTriangleWithLabel(manufacture.actualFAT, '#10b981', 'Actual FAT', 8);
-                    
-                    // FAT delay indicator
-                    if (manufacture.planFAT && !manufacture.actualFAT) {
-                        const planFATDate = new Date(manufacture.planFAT);
-                        if (planFATDate < today) {
-                            ganttHTML += drawSpanBar(manufacture.planFAT, today.toISOString().split('T')[0], '#ef4444', 'FAT Delayed', 32);
-                        }
-                    }
+                    html += tri(delivery.planDelivery100, '#06b6d4', 'Plan Delivery', 5);
+                    html += tri(delivery.actualDelivery100, '#14b8a6', 'Actual Delivery', 5);
+                    html += tri(delivery.planMaterialAtSite100, '#8b5cf6', 'Plan Material On Site', 22);
+                    html += tri(delivery.actualMaterialAtSite100, '#a855f7', 'Actual Material On Site', 22);
+                    html += tri(manufacture.planFAT, '#f59e0b', 'Plan FAT', 39);
+                    html += tri(manufacture.actualFAT, '#10b981', 'Actual FAT', 39);
+                    if (delivery.planDelivery100 && !delivery.actualDelivery100 && new Date(delivery.planDelivery100) < today)
+                        html += bar(delivery.planDelivery100, todayStr, '#ef4444', 'Delivery Delayed', 52);
+                } else if (view === 'delivery') {
+                    html += tri(delivery.planDelivery100, '#06b6d4', 'Plan Delivery', 8);
+                    html += tri(delivery.actualDelivery100, '#14b8a6', 'Actual Delivery', 8);
+                    if (delivery.planDelivery100 && !delivery.actualDelivery100 && new Date(delivery.planDelivery100) < today)
+                        html += bar(delivery.planDelivery100, todayStr, '#ef4444', 'Delayed', 48);
+                } else if (view === 'material') {
+                    html += tri(delivery.planMaterialAtSite100, '#8b5cf6', 'Plan Material On Site', 8);
+                    html += tri(delivery.actualMaterialAtSite100, '#a855f7', 'Actual Material On Site', 8);
+                } else if (view === 'fat') {
+                    html += tri(manufacture.planFAT, '#f59e0b', 'Plan FAT', 8);
+                    html += tri(manufacture.actualFAT, '#10b981', 'Actual FAT', 8);
+                    if (manufacture.planFAT && !manufacture.actualFAT && new Date(manufacture.planFAT) < today)
+                        html += bar(manufacture.planFAT, todayStr, '#ef4444', 'FAT Delayed', 32);
                 }
                 
-                // Generic delay indicator for delivery/material views
-                if (view === 'delivery' && delivery.planDelivery100 && !delivery.actualDelivery100) {
-                    const planDate = new Date(delivery.planDelivery100);
-                    if (planDate < today) {
-                        ganttHTML += drawSpanBar(delivery.planDelivery100, today.toISOString().split('T')[0], '#ef4444', 'Delayed', 48);
-                    }
-                }
+                html += '</td></tr>';
             });
+            html += '</tbody></table>';
             
-            ganttHTML += `
-                        </div>
-                    </div>
-                </div>
-            `;
+            // Add today label overlay
+            if (todayOffset >= 0 && todayOffset <= chartWidth) {
+                html += '<div style="position:relative;height:0;"><div style="position:absolute;top:-'+(filteredPackages.length * rowHeight + 55)+'px;left:'+(leftColW + todayOffset - 25)+'px;width:50px;text-align:center;font-size:0.65rem;color:#f59e0b;font-weight:700;background:rgba(15,23,42,0.9);padding:0.15rem;border-radius:4px;border:1px solid #f59e0b;z-index:25;">TODAY</div></div>';
+            }
             
-            document.getElementById('ganttChartContainer').innerHTML = ganttHTML;
+            document.getElementById('ganttChartContainer').innerHTML = html;
             
             // Update statistics
             updateScheduleStats();
