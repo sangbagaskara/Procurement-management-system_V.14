@@ -4451,96 +4451,98 @@
             const buildAndDownloadXLSX = () => {
                 const wb = XLSX.utils.book_new();
                 
-                // ===== SHEET 1: Project =====
-                const projData = [
-                    ['PROJECT INFORMATION'],
-                    [],
-                    ['Field', 'Value'],
-                    ['Project Name', proj?.name || '-'],
-                    ['Owner', proj?.owner || '-'],
-                    ['Contractor', proj?.contractor || '-'],
-                    ['Technology Provider', proj?.technologyProvider || '-'],
-                    ['Contract Type', proj?.contractType || '-'],
-                    ['Contract Value (USD)', proj?.contractPrice || 0],
-                    ['Start Date', proj?.startDate || '-'],
-                    ['Finish Date', proj?.finishDate || '-'],
-                    ['Guarantee Power (MW)', proj?.guaranteePower || '-'],
-                    ['LD Delay (USD/day)', proj?.ldDelay || 0],
-                    ['Total Packages', pkgs.length],
-                    ['Export Date', new Date().toLocaleString()],
-                    [],
-                    ['SUMMARY STATISTICS'],
-                    [],
-                    ['Metric', 'Count'],
-                    ['PO Issued', pkgs.filter(p => p.milestones?.issuePO?.actual).length],
-                    ['Delivery Completed', pkgs.filter(p => p.delivery?.actualDelivery100).length],
-                    ['Material On Site', pkgs.filter(p => p.delivery?.actualMaterialAtSite100).length],
-                    ['Delivery Delayed', pkgs.filter(p => p.delivery?.planDelivery100 && p.delivery.planDelivery100 < todayStr && !p.delivery.actualDelivery100).length],
-                    ['FAT Completed', pkgs.filter(p => p.manufacture?.actualFAT).length],
-                    ['FAT Delayed', pkgs.filter(p => p.manufacture?.planFAT && p.manufacture.planFAT < todayStr && !p.manufacture.actualFAT).length],
+                // ===== SHEET 1: Project (matching reference format) =====
+                const projHeader = ['ID','Name','Owner','Contractor','Technology Provider','Contract Type',
+                    'Contract Price','Payment Term','Start Date','Finish Date','LD Delay','LD Performance',
+                    'Guarantee Power','Scope by Owner'];
+                const projRow = [
+                    proj?.id||'', proj?.name||'', proj?.owner||'', proj?.contractor||'',
+                    proj?.technologyProvider||'', proj?.contractType||'', proj?.contractPrice||0,
+                    proj?.paymentTerm||'', proj?.startDate||'', proj?.finishDate||'',
+                    proj?.ldDelay||0, proj?.ldPerformance||0, proj?.guaranteePower||'', proj?.scopeByOwner||''
                 ];
-                const ws1 = XLSX.utils.aoa_to_sheet(projData);
-                ws1['!cols'] = [{wch:25},{wch:40}];
-                XLSX.utils.book_append_sheet(wb, ws1, 'Project');
+                const ws1 = XLSX.utils.aoa_to_sheet([projHeader, projRow]);
+                ws1['!cols'] = [{wch:16},{wch:30},{wch:30},{wch:45},{wch:20},{wch:16},
+                    {wch:14},{wch:18},{wch:12},{wch:12},{wch:10},{wch:12},{wch:12},{wch:30}];
+                XLSX.utils.book_append_sheet(wb, ws1, 'Projects');
                 
-                // ===== SHEET 2: Packages =====
-                const pkgHeader = ['No','RFQ No','Package Name','Discipline','Area','Initiation','Vendor','COO',
-                    'Bid Eval Plan','Bid Eval Actual','Issue PO Plan','Issue PO Actual','Kick-Off Plan','Kick-Off Actual',
-                    'Design Approval Plan','Design Approval Actual','MR Approval Plan','MR Approval Actual',
-                    'Sub-vendor PO Plan','Sub-vendor PO Actual','FAI Plan','FAI Actual',
-                    'Mfg Start Plan','Mfg Finish Plan','Mfg Progress %',
-                    'FAT Plan','FAT Actual','FAT Result',
-                    'Delivery Plan','Delivery Actual','On Site Plan','On Site Actual','Delivery Status'];
-                const pkgRows = pkgs.map((p, i) => {
-                    const ms = p.milestones || {}, mf = p.manufacture || {}, d = p.delivery || {};
-                    let st = 'Pending';
-                    if (d.actualMaterialAtSite100) st = 'On Site';
-                    else if (d.actualDelivery100) st = 'In Transit';
-                    else if (d.planDelivery100 && d.planDelivery100 < todayStr) st = 'Delayed';
-                    else if (d.planDelivery100) st = 'Scheduled';
-                    return [i+1, p.rfqNo, p.packageName, p.discipline, p.area, p.initiation, p.vendorName||'', p.coo||'',
-                        ms.bidEvaluation?.plan||'', ms.bidEvaluation?.actual||'',
+                // ===== SHEET 2: Packages (Complete - 58 columns matching reference) =====
+                const pkgHeader = [
+                    'ID','Project ID','Initiation','Discipline','Area','RFQ No','Package Name','Description','Contract No','Vendor Name','COO',
+                    'Issue RFQ Plan','Issue RFQ Actual','Receive Quotation Plan','Receive Quotation Actual',
+                    'Issue TBE Plan','Issue TBE Actual','Issue CBE Plan','Issue CBE Actual',
+                    'Final Negotiation Plan','Final Negotiation Actual','Issue PO Plan','Issue PO Actual',
+                    'KOM Plan','KOM Actual',
+                    'Eng Required','Eng Plan Start','Eng Plan Finish','Eng Actual Start','Eng Actual Finish',
+                    'Eng Status Date','Eng Plan Progress','Eng Actual Progress','Eng Remark',
+                    'Mfg Plan Start','Mfg Plan Finish','Mfg Actual Start','Mfg Actual Finish',
+                    'Mfg Status Date','Mfg Plan Progress','Mfg Actual Progress','Mfg Remark',
+                    'Plan FAT','Actual FAT','FAT Result','FAT Remarks',
+                    'Incoterm','Delivery Location','Plan Delivery 100','Actual Delivery 100',
+                    'Shipping Status Date','Shipping Status Plan','Shipping Status',
+                    'Plan Material at Site 100','Actual Material at Site 100',
+                    'Material Status Date','Material at Site Plan','Material Received Actual'
+                ];
+                const pkgRows = pkgs.map((p) => {
+                    const ms = p.milestones || {}, eng = p.engineering || {}, mf = p.manufacture || {}, d = p.delivery || {};
+                    return [
+                        p.id, p.projectId, p.initiation, p.discipline, p.area, p.rfqNo, p.packageName, p.description||'', p.contractNo||'', p.vendorName||'', p.coo||'',
+                        ms.issueRFQ?.plan||'', ms.issueRFQ?.actual||'',
+                        ms.receiveQuotation?.plan||'', ms.receiveQuotation?.actual||'',
+                        ms.issueTBE?.plan||'', ms.issueTBE?.actual||'',
+                        ms.issueCBE?.plan||'', ms.issueCBE?.actual||'',
+                        ms.finalNegotiation?.plan||'', ms.finalNegotiation?.actual||'',
                         ms.issuePO?.plan||'', ms.issuePO?.actual||'',
-                        ms.kickOff?.plan||'', ms.kickOff?.actual||'',
-                        ms.designApproval?.plan||'', ms.designApproval?.actual||'',
-                        ms.mrApproval?.plan||'', ms.mrApproval?.actual||'',
-                        ms.subVendorPO?.plan||'', ms.subVendorPO?.actual||'',
-                        ms.fai?.plan||'', ms.fai?.actual||'',
-                        mf.planStart||'', mf.planFinish||'', mf.actualProgress||0,
-                        mf.planFAT||'', mf.actualFAT||'', mf.fatResult||'',
-                        d.planDelivery100||'', d.actualDelivery100||'',
-                        d.planMaterialAtSite100||'', d.actualMaterialAtSite100||'', st
+                        ms.kom?.plan||'', ms.kom?.actual||'',
+                        eng.required ? 'TRUE' : 'FALSE', eng.planStart||'', eng.planFinish||'', eng.actualStart||'', eng.actualFinish||'',
+                        eng.statusDate||'', eng.planProgress ?? '', eng.actualProgress ?? '', eng.remark||'',
+                        mf.planStart||'', mf.planFinish||'', mf.actualStart||'', mf.actualFinish||'',
+                        mf.statusDate||'', mf.planProgress ?? '', mf.actualProgress ?? '', mf.remark||'',
+                        mf.planFAT||'', mf.actualFAT||'', mf.fatResult||'', mf.fatRemarks||'',
+                        d.incoterm||'', d.deliveryLocation||'', d.planDelivery100||'', d.actualDelivery100||'',
+                        d.shippingStatusDate||'', d.shippingStatusPlan ?? '', d.shippingStatus ?? '',
+                        d.planMaterialAtSite100||'', d.actualMaterialAtSite100||'',
+                        d.materialStatusDate||'', d.materialAtSitePlan ?? '', d.materialReceivedActual ?? ''
                     ];
                 });
                 const ws2 = XLSX.utils.aoa_to_sheet([pkgHeader, ...pkgRows]);
-                ws2['!cols'] = [{wch:4},{wch:14},{wch:35},{wch:12},{wch:8},{wch:8},{wch:28},{wch:8},
-                    ...Array(24).fill({wch:12})];
-                ws2['!autofilter'] = { ref: 'A1:AG' + (pkgRows.length + 1) };
+                ws2['!cols'] = [
+                    {wch:16},{wch:16},{wch:6},{wch:12},{wch:6},{wch:22},{wch:38},{wch:20},{wch:22},{wch:30},{wch:10},
+                    ...Array(14).fill({wch:13}), // milestones (Issue RFQ to KOM)
+                    {wch:8},...Array(8).fill({wch:13}), // engineering
+                    ...Array(8).fill({wch:13}), // manufacture
+                    {wch:13},{wch:13},{wch:14},{wch:20}, // FAT
+                    {wch:8},{wch:16},{wch:13},{wch:13}, // delivery
+                    {wch:13},{wch:10},{wch:10}, // shipping
+                    {wch:13},{wch:13},{wch:13},{wch:10},{wch:10} // material
+                ];
+                ws2['!autofilter'] = { ref: 'A1:BF' + (pkgRows.length + 1) };
                 XLSX.utils.book_append_sheet(wb, ws2, 'Packages');
                 
-                // ===== SHEET 3: Risk Analysis =====
-                const riskHeader = ['No','Package Name','Category','Risk Description','Probability','Impact','Risk Level','Risk Score',
-                    'Status','Mitigation','Owner','Due Date','Source'];
-                const riskRows = rs.map((r, i) => {
-                    const pkg = packages.find(p => p.id === r.packageId);
-                    const scoreMap = { 'Low': 1, 'Medium': 2, 'High': 3 };
-                    const score = (scoreMap[r.probability]||1) * (scoreMap[r.impact]||1);
-                    return [i+1, pkg?.packageName||'-', r.category, r.riskDescription,
-                        r.probability, r.impact, r.riskLevel, score,
-                        r.status, r.mitigation, r.owner, r.dueDate||'',
-                        r.isAutoGenerated ? 'Auto-generated' : 'Manual'
+                // ===== SHEET 3: Risk Analysis (matching reference format) =====
+                const riskHeader = ['ID','Project ID','Package ID','Category','Risk Description',
+                    'Probability','Impact','Risk Level','Status','Mitigation','Owner','Due Date',
+                    'Is Auto Generated','Generated Date'];
+                const riskRows = rs.map((r) => {
+                    return [
+                        r.id||'', r.projectId||'', r.packageId||'',
+                        r.category, r.riskDescription,
+                        r.probability, r.impact, r.riskLevel, r.status,
+                        r.mitigation, r.owner, r.dueDate||'',
+                        r.isAutoGenerated ? 'TRUE' : 'FALSE', r.generatedDate||''
                     ];
                 });
                 const ws3 = XLSX.utils.aoa_to_sheet([riskHeader, ...riskRows]);
-                ws3['!cols'] = [{wch:4},{wch:30},{wch:18},{wch:45},{wch:10},{wch:10},{wch:10},{wch:8},
-                    {wch:8},{wch:45},{wch:15},{wch:12},{wch:14}];
-                ws3['!autofilter'] = { ref: 'A1:M' + (riskRows.length + 1) };
-                XLSX.utils.book_append_sheet(wb, ws3, 'Risk Analysis');
+                ws3['!cols'] = [{wch:16},{wch:16},{wch:16},{wch:18},{wch:50},
+                    {wch:10},{wch:10},{wch:10},{wch:8},{wch:50},{wch:18},{wch:12},
+                    {wch:14},{wch:22}];
+                ws3['!autofilter'] = { ref: 'A1:N' + (riskRows.length + 1) };
+                XLSX.utils.book_append_sheet(wb, ws3, 'Risks');
                 
                 // Download
                 const fileName = (proj?.name||'Procurement').replace(/\s+/g,'_') + '_Export_' + todayStr + '.xlsx';
                 XLSX.writeFile(wb, fileName);
-                showNotification('Exported to Excel (.xlsx) with 3 sheets: Project, Packages, Risk Analysis', 'success');
+                showNotification('Exported to Excel (.xlsx) with 3 sheets: Projects, Packages (58 cols), Risks', 'success');
             };
             
             doExport();
