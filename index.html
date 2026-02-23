@@ -3363,8 +3363,7 @@
                     }
                 }
                 
-                // Always add exact end date as final point to guarantee plan reaches 100%
-                // Bug fix: step-based iteration may miss the last few days (e.g. 10-day gap)
+                // Add exact end date as final point (natural value, not forced to 100%)
                 {
                     const endMonth = end.toLocaleDateString('id-ID', {month:'short'});
                     const endYear = end.getFullYear().toString().slice(-2);
@@ -3373,9 +3372,15 @@
                     const lastChartDate = new Date(start);
                     lastChartDate.setDate(lastChartDate.getDate() + Math.floor(total / step) * step);
                     const needsEndPoint = lastChartDate < end;
+                    
+                    // Calculate natural plan progress at end date
+                    let endPlanProgress = 0;
+                    pkgs.forEach(pkg => { endPlanProgress += calcPackageProgressAtDate(pkg, end.toISOString(), weightFactors); });
+                    endPlanProgress = endPlanProgress / pkgs.length;
+                    
                     if (needsEndPoint) {
                         if (lastLabel === endLabel) {
-                            planData[planData.length - 1] = 100;
+                            planData[planData.length - 1] = endPlanProgress;
                             if (end <= cutoffDate) {
                                 let endActualProgress = 0;
                                 pkgs.forEach(pkg => { endActualProgress += calcPackageActualProgressAtDate(pkg, end.toISOString(), weightFactors); });
@@ -3383,16 +3388,26 @@
                             }
                         } else {
                             labels.push(endLabel);
-                            planData.push(100);
+                            planData.push(endPlanProgress);
                             if (end <= cutoffDate) {
                                 let endActualProgress = 0;
                                 pkgs.forEach(pkg => { endActualProgress += calcPackageActualProgressAtDate(pkg, end.toISOString(), weightFactors); });
                                 actualData.push(endActualProgress / pkgs.length);
                             } else { actualData.push(null); }
                         }
-                    } else {
-                        planData[planData.length - 1] = 100;
                     }
+                    
+                    // Count packages with incomplete plan data
+                    const incompletePkgs = pkgs.filter(pkg => {
+                        const ms = pkg.milestones || {};
+                        const mf = pkg.manufacture || {};
+                        const dl = pkg.delivery || {};
+                        const hasMilestones = ['issueRFQ','receiveQuotation','issueTBE','issueCBE','finalNegotiation','issuePO','kom'].every(k => (ms[k]||{}).plan);
+                        const hasMfg = mf.planStart && (mf.planFinish || mf.planFAT || dl.planDelivery100);
+                        return !hasMilestones || !hasMfg;
+                    }).length;
+                    window._scurveIncompletePkgs = incompletePkgs;
+                    window._scurveMaxPlan = endPlanProgress;
                 }
                 
                 // Calculate current actual progress at cut-off date for display
@@ -3440,7 +3455,11 @@
                     const cutoffStr = cutoffDate.toLocaleDateString('id-ID', {day:'numeric', month:'short', year:'numeric'});
                     const varianceColor = variance >= 0 ? '#34d399' : '#f87171';
                     const varianceSign = variance >= 0 ? '+' : '';
-                    dateRangeEl.innerHTML = `📅 Period: ${startStr} → ${endStr} | 📊 Cut-off: ${cutoffStr} | <span style="color:${varianceColor}">Variance: ${varianceSign}${variance.toFixed(1)}%</span> (Plan: ${currentPlanAtCutoff.toFixed(1)}% / Actual: ${currentActualAtCutoff.toFixed(1)}%)`;
+                    let infoHtml = `📅 Period: ${startStr} → ${endStr} | 📊 Cut-off: ${cutoffStr} | <span style="color:${varianceColor}">Variance: ${varianceSign}${variance.toFixed(1)}%</span> (Plan: ${currentPlanAtCutoff.toFixed(1)}% / Actual: ${currentActualAtCutoff.toFixed(1)}%)`;
+                    if (window._scurveIncompletePkgs > 0) {
+                        infoHtml += ` | <span style="color:#f59e0b;">⚠ ${window._scurveIncompletePkgs} pkg(s) incomplete plan data → Max Plan: ${window._scurveMaxPlan.toFixed(1)}%</span>`;
+                    }
+                    dateRangeEl.innerHTML = infoHtml;
                 }
             }
             
