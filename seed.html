@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seed Google Sheets — Salak Unit 7</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  .card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 2.5rem; max-width: 580px; width: 90%; }
+  h1 { font-size: 1.4rem; color: #2dd4bf; margin-bottom: 0.5rem; }
+  .sub { color: #94a3b8; font-size: 0.875rem; margin-bottom: 2rem; }
+  label { display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.4rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  input[type=text] { width: 100%; padding: .75rem 1rem; background: #0f172a; border: 1px solid #475569; border-radius: 8px; color: #e2e8f0; font-size: 0.9rem; outline: none; }
+  input[type=text]:focus { border-color: #2dd4bf; }
+  .btn { display: block; width: 100%; margin-top: 1.5rem; padding: .875rem; background: #0d9488; border: none; border-radius: 8px; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background .2s; }
+  .btn:hover { background: #0f766e; }
+  .btn:disabled { background: #334155; cursor: not-allowed; }
+  .log { margin-top: 1.5rem; background: #0f172a; border-radius: 8px; padding: 1rem; font-size: 0.8rem; font-family: monospace; max-height: 220px; overflow-y: auto; border: 1px solid #334155; }
+  .log .ok   { color: #34d399; }
+  .log .err  { color: #f87171; }
+  .log .info { color: #94a3b8; }
+  .stats { display: flex; gap: 1rem; margin: 1rem 0; }
+  .stat { flex: 1; background: #0f172a; border-radius: 8px; padding: .75rem; text-align: center; border: 1px solid #334155; }
+  .stat .n { font-size: 1.5rem; font-weight: 700; color: #2dd4bf; }
+  .stat .l { font-size: 0.7rem; color: #64748b; }
+  .warning { background: rgba(251,191,36,.1); border: 1px solid rgba(251,191,36,.3); border-radius: 8px; padding: .75rem 1rem; font-size: 0.8rem; color: #fbbf24; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>🌱 Seed Google Sheets</h1>
+  <p class="sub">Upload initial data from <code>seed_data.json</code> into your Google Sheets — run once on first setup.</p>
+
+  <label>Apps Script Web App URL</label>
+  <input type="text" id="urlInput" placeholder="https://script.google.com/macros/s/…/exec">
+
+  <div class="stats">
+    <div class="stat"><div class="n" id="cntPkg">–</div><div class="l">Packages</div></div>
+    <div class="stat"><div class="n" id="cntRisk">–</div><div class="l">Risks</div></div>
+    <div class="stat"><div class="n" id="cntProj">–</div><div class="l">Projects</div></div>
+  </div>
+
+  <div class="warning">⚠️ This will <strong>overwrite</strong> existing data in Google Sheets. Only run on first setup or when resetting.</div>
+
+  <button class="btn" id="seedBtn" onclick="runSeed()">Upload Seed Data to Google Sheets</button>
+
+  <div class="log" id="log"><span class="info">Ready. Enter your Apps Script URL and click the button.</span></div>
+</div>
+
+<script>
+let seedData = null;
+
+function log(msg, type = 'info') {
+  const el = document.getElementById('log');
+  el.innerHTML += `\n<span class="${type}">[${new Date().toLocaleTimeString()}] ${msg}</span>`;
+  el.scrollTop = el.scrollHeight;
+}
+
+// Load seed_data.json
+fetch('seed_data.json')
+  .then(r => r.json())
+  .then(d => {
+    seedData = d;
+    document.getElementById('cntPkg').textContent  = (d.packages || []).length;
+    document.getElementById('cntRisk').textContent = (d.risks    || []).length;
+    document.getElementById('cntProj').textContent = (d.projects || []).length;
+    log(`seed_data.json loaded — ${d.packages.length} packages, ${d.risks.length} risks`, 'ok');
+  })
+  .catch(e => log('Failed to load seed_data.json: ' + e.message, 'err'));
+
+async function runSeed() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url) { log('Please enter your Apps Script URL', 'err'); return; }
+  if (!seedData) { log('Seed data not loaded', 'err'); return; }
+
+  const btn = document.getElementById('seedBtn');
+  btn.disabled = true;
+  btn.textContent = 'Uploading…';
+
+  // 1. Ping
+  log('Pinging Apps Script…');
+  try {
+    const ping = await fetch(url + '?action=ping').then(r => r.json());
+    log('Ping OK: ' + ping.message, 'ok');
+  } catch(e) {
+    log('Ping failed: ' + e.message + '. Check CORS / deployment settings.', 'err');
+    btn.disabled = false; btn.textContent = 'Upload Seed Data to Google Sheets';
+    return;
+  }
+
+  // 2. Seed
+  log('Seeding Projects…');
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'seedData', data: seedData })
+    }).then(r => r.json());
+
+    if (res.error) { log('Error: ' + res.error, 'err'); }
+    else {
+      const r = res.results || {};
+      log(`Projects: ${(r.projects||{}).rows ?? '?'} rows`, 'ok');
+      log(`Packages: ${(r.packages||{}).rows ?? '?'} rows`, 'ok');
+      log(`Risks: ${(r.risks||{}).rows ?? '?'} rows`, 'ok');
+      log('✅ Seed complete! You can now open index.html', 'ok');
+    }
+  } catch(e) {
+    log('Seed failed: ' + e.message, 'err');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Upload Seed Data to Google Sheets';
+}
+</script>
+</body>
+</html>
