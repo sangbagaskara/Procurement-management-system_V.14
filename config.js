@@ -1,4 +1,4 @@
-window.APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxAntHSTrM1CJlkIZbOWIr6-5F-YkLyRPUyEzEMbRMqJYynvLA69ZGOpQjWi07c2qV9/exec';
+window.APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqHf3UKu2UNan8jcmNDugO9QAt9e6c1nwWCFv6pxSYsZDtWSEKkM6RH0SWi0vgWyRr/exec';
 
 window.DASHBOARD_CONFIG = {
   projectName:    'Salak Unit 7 Development',
