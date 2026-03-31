@@ -1,101 +1,89 @@
 // ============================================================
 // api.js — Salak Unit 7 Dashboard API Client
-// Handles all communication with Google Apps Script backend
+// Semua request pakai GET (no CORS issue dengan Apps Script)
+// Data dikirim via URL parameter ?payload=<base64-json>
 // ============================================================
 
 const API = (() => {
-  // ── CONFIG ─────────────────────────────────────────────────
-  // Set your deployed Apps Script Web App URL here
-  // or in config.js as window.APPS_SCRIPT_URL
-  const GAS_URL = window.APPS_SCRIPT_URL || '';
+  const GAS_URL = () => window.APPS_SCRIPT_URL || '';
 
-  let _online = false;
-  let _lastSync = null;
-
-  // ── LOW-LEVEL FETCH ────────────────────────────────────────
-  async function gasGet(params = {}) {
-    if (!GAS_URL) throw new Error('APPS_SCRIPT_URL not configured');
+  // ── LOW-LEVEL: GET only ────────────────────────────────────
+  // Untuk read: ?action=xxx
+  // Untuk write: ?action=xxx&payload=<base64(JSON)>
+  async function gasCall(params = {}) {
+    const url = GAS_URL();
+    if (!url || url.includes('YOUR_APPS')) throw new Error('APPS_SCRIPT_URL not configured');
     const qs = new URLSearchParams(params).toString();
-    const res = await fetch(`${GAS_URL}?${qs}`, { method: 'GET' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-  }
-
-  async function gasPost(body = {}) {
-    if (!GAS_URL) throw new Error('APPS_SCRIPT_URL not configured');
-    const res = await fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
+    const res = await fetch(`${url}?${qs}`, {
+      method: 'GET',
+      redirect: 'follow'
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
+    const text = await res.text();
+    try { return JSON.parse(text); }
+    catch { throw new Error('Invalid JSON response: ' + text.substring(0, 100)); }
+  }
+
+  // Encode payload sebagai base64 untuk dikirim via GET
+  function encodePayload(obj) {
+    const json = JSON.stringify(obj);
+    // btoa tidak support Unicode — encode dulu
+    const bytes = new TextEncoder().encode(json);
+    let binary = '';
+    bytes.forEach(b => binary += String.fromCharCode(b));
+    return btoa(binary);
   }
 
   // ── PUBLIC API ─────────────────────────────────────────────
 
-  /** Test connectivity */
   async function ping() {
     try {
-      const r = await gasGet({ action: 'ping' });
-      _online = r.status === 'ok';
-      return _online;
-    } catch {
-      _online = false;
-      return false;
-    }
+      const r = await gasCall({ action: 'ping' });
+      return r.status === 'ok';
+    } catch { return false; }
   }
 
-  /** Fetch all data from Sheets */
   async function fetchAll() {
-    const data = await gasGet({ action: 'getAll' });
-    _lastSync = new Date().toISOString();
-    return data;
+    return gasCall({ action: 'getAll' });
   }
 
-  /** Full sync: push all local data to Sheets (overwrites) */
+  // Untuk write operations — pakai action + payload via GET
+  async function gasWrite(action, data) {
+    return gasCall({ action, payload: encodePayload(data) });
+  }
+
   async function syncAll(data) {
-    const r = await gasPost({ action: 'syncAll', data });
-    _lastSync = new Date().toISOString();
-    return r;
+    return gasWrite('syncAll', data);
   }
 
-  /** Seed Sheets on first setup */
   async function seedData(data) {
-    return gasPost({ action: 'seedData', data });
+    return gasWrite('seedData', data);
   }
 
-  /** Upsert one package */
   async function upsertPackage(record) {
-    return gasPost({ action: 'upsertPackage', record });
+    return gasWrite('upsertPackage', { record });
   }
 
-  /** Delete one package */
   async function deletePackage(id) {
-    return gasPost({ action: 'deletePackage', id: String(id) });
+    return gasWrite('deletePackage', { id: String(id) });
   }
 
-  /** Upsert one risk */
   async function upsertRisk(record) {
-    return gasPost({ action: 'upsertRisk', record });
+    return gasWrite('upsertRisk', { record });
   }
 
-  /** Delete one risk */
   async function deleteRisk(id) {
-    return gasPost({ action: 'deleteRisk', id: String(id) });
+    return gasWrite('deleteRisk', { id: String(id) });
   }
 
-  /** Log activity entry */
   async function logActivity(entry) {
-    return gasPost({ action: 'logActivity', entry });
+    return gasWrite('logActivity', { entry });
   }
 
   return {
     ping, fetchAll, syncAll, seedData,
     upsertPackage, deletePackage,
     upsertRisk, deleteRisk,
-    logActivity,
-    isOnline: () => _online,
-    lastSync: () => _lastSync
+    logActivity
   };
 })();
