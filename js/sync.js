@@ -1,67 +1,74 @@
 // ============================================================
 // sync.js — Sync Manager
-// Handles online/offline sync between localStorage and Sheets
+// Push: per-record upsert (menghindari URL length limit)
+// Pull: getAll sekaligus (read tidak ada limit)
 // ============================================================
 
 const SyncManager = (() => {
-  const QUEUE_KEY    = 'salak_sync_queue';
   const LAST_SYNC_KEY = 'salak_last_sync';
-  const STATUS_CB    = [];   // status change callbacks
+  const STATUS_CB = [];
 
   // ── STATUS ─────────────────────────────────────────────────
-  let _status = 'idle'; // idle | syncing | ok | error | offline
+  let _status = 'idle';
   function setStatus(s, msg = '') {
     _status = s;
     STATUS_CB.forEach(cb => cb(s, msg));
   }
   function onStatusChange(cb) { STATUS_CB.push(cb); }
 
-  // ── QUEUE ──────────────────────────────────────────────────
-  function getQueue() {
-    try { return JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]'); }
-    catch { return []; }
-  }
-  function saveQueue(q) { localStorage.setItem(QUEUE_KEY, JSON.stringify(q)); }
-
-  function enqueue(op) {
-    const q = getQueue();
-    // De-duplicate: remove prior op for same id + action
-    const filtered = q.filter(x => !(x.table === op.table && x.id === op.id));
-    filtered.push({ ...op, ts: new Date().toISOString() });
-    saveQueue(filtered);
-  }
-
-  function clearQueue() { localStorage.removeItem(QUEUE_KEY); }
-
-  // ── FULL SYNC TO SHEETS ────────────────────────────────────
+  // ── PUSH ALL — kirim per record ────────────────────────────
   async function pushAll(data) {
     if (!window.APPS_SCRIPT_URL) { setStatus('offline', 'No URL'); return false; }
-    setStatus('syncing', 'Pushing all data…');
+
+    const packages = DataTransform.packagesToFlat(data.packages || [], new Date().toISOString());
+    const risks    = DataTransform.risksNormalize(data.risks    || []);
+    const projects = data.projects || [];
+
+    const total = projects.length + packages.length + risks.length;
+    let done = 0;
+
+    setStatus('syncing', `Syncing 0/${total}…`);
+
     try {
-      const flat = {
-        projects: data.projects,
-        packages: DataTransform.packagesToFlat(data.packages, new Date().toISOString()),
-        risks:    DataTransform.risksNormalize(data.risks)
-      };
-      await API.syncAll(flat);
-      clearQueue();
+      // Projects (biasanya hanya 1)
+      for (const rec of projects) {
+        await API.upsertProject(rec);
+        done++;
+        setStatus('syncing', `Syncing ${done}/${total}…`);
+      }
+
+      // Packages — upsert satu per satu
+      for (const rec of packages) {
+        await API.upsertPackage(rec);
+        done++;
+        if (done % 10 === 0) setStatus('syncing', `Syncing packages ${done}/${total}…`);
+      }
+
+      // Risks
+      for (const rec of risks) {
+        await API.upsertRisk(rec);
+        done++;
+        if (done % 20 === 0) setStatus('syncing', `Syncing risks ${done}/${total}…`);
+      }
+
       localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
-      setStatus('ok', 'Synced');
+      setStatus('ok', `✓ Synced ${total} records`);
       return true;
+
     } catch (e) {
       setStatus('error', e.message);
       return false;
     }
   }
 
-  // ── FETCH FROM SHEETS ──────────────────────────────────────
+  // ── PULL ALL — baca sekaligus (GET, tidak ada limit) ───────
   async function pullAll() {
     if (!window.APPS_SCRIPT_URL) { setStatus('offline', 'No URL'); return null; }
     setStatus('syncing', 'Fetching from Sheets…');
     try {
       const data = await API.fetchAll();
       localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
-      setStatus('ok', 'Fetched');
+      setStatus('ok', `✓ Pulled ${(data.packages||[]).length} packages`);
       return {
         projects: data.projects || [],
         packages: DataTransform.packagesToNested(data.packages || []),
@@ -73,60 +80,17 @@ const SyncManager = (() => {
     }
   }
 
-  // ── SEED (first time setup) ────────────────────────────────
-  async function seedSheets(data) {
-    if (!window.APPS_SCRIPT_URL) return { ok: false, msg: 'No URL' };
-    setStatus('syncing', 'Seeding Google Sheets…');
-    try {
-      const flat = {
-        projects: data.projects,
-        packages: DataTransform.packagesToFlat(data.packages, new Date().toISOString()),
-        risks:    DataTransform.risksNormalize(data.risks)
-      };
-      await API.seedData(flat);
-      clearQueue();
-      localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
-      setStatus('ok', 'Seeded');
-      return { ok: true };
-    } catch (e) {
-      setStatus('error', e.message);
-      return { ok: false, msg: e.message };
-    }
-  }
-
-  // ── DRAIN QUEUE (flush pending ops) ───────────────────────
-  async function drainQueue() {
-    const q = getQueue();
-    if (!q.length) return { flushed: 0 };
-    setStatus('syncing', `Flushing ${q.length} queued ops…`);
-    let flushed = 0;
-    for (const op of q) {
-      try {
-        if (op.action === 'upsertPackage') await API.upsertPackage(op.record);
-        else if (op.action === 'deletePackage') await API.deletePackage(op.id);
-        else if (op.action === 'upsertRisk') await API.upsertRisk(op.record);
-        else if (op.action === 'deleteRisk') await API.deleteRisk(op.id);
-        flushed++;
-      } catch { /* leave in queue */ }
-    }
-    const remaining = getQueue().slice(flushed);
-    saveQueue(remaining);
-    if (remaining.length === 0) setStatus('ok', 'Queue flushed');
-    return { flushed, remaining: remaining.length };
-  }
-
   // ── PING ───────────────────────────────────────────────────
   async function ping() {
     const ok = await API.ping();
-    setStatus(ok ? 'ok' : 'offline', ok ? 'Connected' : 'Offline');
+    setStatus(ok ? 'ok' : 'offline', ok ? 'Connected to Sheets' : 'Offline');
     return ok;
   }
 
   return {
-    pushAll, pullAll, seedSheets, drainQueue, ping,
-    enqueue, getQueue, clearQueue,
+    pushAll, pullAll, ping,
     onStatusChange,
     getStatus: () => _status,
-    lastSync: () => localStorage.getItem(LAST_SYNC_KEY)
+    lastSync:  () => localStorage.getItem(LAST_SYNC_KEY)
   };
 })();
